@@ -1,0 +1,93 @@
+version: '3.0'
+services:
+  lifemusic_fe:
+    image: node:$NODE_VERSION
+    volumes:
+      - $FE_ROOT_VOLUME:./
+    depends_on:
+      - lifemusic_be
+
+  lifemusic_be:
+    image: node:$NODE_VERSION
+    volumes:
+      - $BE_ROOT_VOLUME:./
+    networks:
+      - lifemusic
+
+  lifemusic_jenkins:
+    build:
+      context: docker/Dockerfile/jenkins
+    ports:
+      - 8080:8080
+    networks:
+      - lifemusic
+
+  lifemusic_sync:
+    image: node:$NODE_VERSION
+    volumes:
+      - $SYNC_ROOT_VOLUME:./
+    networks:
+      - lifemusic
+
+  lifemusic_mysql:
+    image: mariadb:11.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=$SYSTEM_PASSWORD
+      - MYSQL_DATABASE=lifemusic
+    networks:
+      - lifemusic
+      
+  lifemusic_postgres:
+    image: postgres:15.4
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=$SYSTEM_PASSWORD
+      - POSTGRES_DB=lifemusic
+    networks:
+      - lifemusic
+
+  lifemusic_redis:
+    image: redis:7.2.1-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - lifemusic
+
+  lifemusic_elasticsearch:
+    build:
+      context: docker/Dockerfile/elasticsearch
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./docker/config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./docker/data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: $SYSTEM_PASSWORD
+      discovery.type: single-node
+    networks:
+      - lifemusic
+
+  lifemusic_kibana:
+    build:
+      context: docker/Dockerfile/kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./docker/config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    networks:
+      - lifemusic
+    depends_on:
+      - lifemusic_elasticsearch
+
+networks:
+  lifemusic:
+    driver: bridge
