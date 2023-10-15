@@ -3,14 +3,14 @@ services:
   lifemusic_fe:
     image: node:$NODE_VERSION
     volumes:
-      - $FE_ROOT_VOLUME:./
+      - $FE_ROOT_VOLUME:/root/work
     depends_on:
       - lifemusic_be
 
   lifemusic_be:
     image: node:$NODE_VERSION
     volumes:
-      - $BE_ROOT_VOLUME:./
+      - $BE_ROOT_VOLUME:/root/work
     networks:
       - lifemusic
 
@@ -25,7 +25,7 @@ services:
   lifemusic_sync:
     image: node:$NODE_VERSION
     volumes:
-      - $SYNC_ROOT_VOLUME:./
+      - $SYNC_ROOT_VOLUME:/root/work
     networks:
       - lifemusic
 
