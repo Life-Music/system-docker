@@ -6,6 +6,10 @@ services:
       - $FE_ROOT_VOLUME:/root/work
     depends_on:
       - lifemusic_be
+    ports:
+      - 5173:5173
+    tty: true
+    working_dir: /root/work
 
   lifemusic_be:
     image: node:$NODE_VERSION
@@ -13,6 +17,10 @@ services:
       - $BE_ROOT_VOLUME:/root/work
     networks:
       - lifemusic
+    ports:
+      - 5174:5174
+    tty: true
+    working_dir: /root/work
 
   lifemusic_jenkins:
     build:
@@ -28,6 +36,8 @@ services:
       - $SYNC_ROOT_VOLUME:/root/work
     networks:
       - lifemusic
+    tty: true
+    working_dir: /root/work
 
   lifemusic_mysql:
     image: mariadb:11.0
