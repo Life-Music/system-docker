@@ -11,6 +11,17 @@ services:
     tty: true
     working_dir: /root/work
 
+  lifemusic_studio:
+    image: node:$NODE_VERSION
+    volumes:
+      - $ST_ROOT_VOLUME:/root/work
+    depends_on:
+      - lifemusic_be
+    ports:
+      - 5175:5173
+    tty: true
+    working_dir: /root/work
+
   lifemusic_be:
     image: node:$NODE_VERSION
     volumes:
