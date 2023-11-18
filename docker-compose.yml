@@ -42,7 +42,10 @@ services:
       - lifemusic
 
   lifemusic_sync:
-    image: node:$NODE_VERSION
+    build:
+      context: docker/Dockerfile/sync
+      args:
+        NODE_VERSION: $NODE_VERSION
     volumes:
       - $SYNC_ROOT_VOLUME:/root/work
     networks:
